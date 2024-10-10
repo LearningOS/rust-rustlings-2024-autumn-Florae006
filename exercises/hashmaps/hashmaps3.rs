@@ -22,6 +22,7 @@ use std::collections::HashMap;
 struct Team {
     goals_scored: u8,
     goals_conceded: u8,
+    goals_goals: u8,
 }
 
 fn build_scores_table(results: String) -> HashMap<String, Team> {
