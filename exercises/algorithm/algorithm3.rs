@@ -8,7 +8,6 @@ fn sort<T>(array: &mut [T])
 where
     T: PartialOrd,
 {
-	//TODO
     for i in 0..array.len() {
         for j in 0..array.len() - 1 {
             if array[j] > array[j + 1] {
