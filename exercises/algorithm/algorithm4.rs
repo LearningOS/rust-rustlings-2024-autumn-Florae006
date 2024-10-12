@@ -41,7 +41,7 @@ where
 
 impl<T> BinarySearchTree<T>
 where
-    T: Ord,
+    T: Ord + Clone,
 {
 
     fn new() -> Self {
@@ -51,22 +51,81 @@ where
     // Insert a value into the BST
     fn insert(&mut self, value: T) {
         //TODO
+        let lp = &mut self.root;
+        let mut node = TreeNode::new(value.clone());
+        match lp {
+            Some(ref mut root) => {
+                if root.value > value {
+                    if root.left.is_none() {
+                        root.left = Some(Box::new(node));
+                    } else {
+                        let mut left = root.left.as_mut().unwrap();
+                        left.insert(value);
+                    }
+                } else if root.value < value {
+                    if root.right.is_none() {
+                        root.right = Some(Box::new(node));
+                    } else {
+                        let mut right = root.right.as_mut().unwrap();
+                        right.insert(value.clone());
+                    }
+                }
+            }
+            None => {
+                *lp = Some(Box::new(node));
+            }
+        }
     }
 
     // Search for a value in the BST
     fn search(&self, value: T) -> bool {
         //TODO
-        true
+        let mut lp = &self.root;
+        while let Some(ref root) = lp {
+            if root.value == value {
+                return true;
+            } else if root.value > value {
+                lp = &root.left;
+            } else {
+                lp = &root.right;
+            }
+        }
+        false
     }
 }
 
 impl<T> TreeNode<T>
 where
-    T: Ord,
+    T: Ord + Clone,
 {
     // Insert a node into the tree
     fn insert(&mut self, value: T) {
         //TODO
+        let node = TreeNode::new(value.clone());
+        match value.cmp(&self.value) {
+            Ordering::Less => {
+                if let Some(ref mut left) = self.left {
+                    left.insert(value);
+                } else {
+                    self.left = Some(Box::new(node));
+                }
+            }
+            Ordering::Greater => {
+                if let Some(ref mut right) = self.right {
+                    right.insert(value);
+                } else {
+                    self.right = Some(Box::new(node));
+                }
+            }
+            Ordering::Equal => {
+                if self.left.is_none() {
+                    self.left = Some(Box::new(node));
+                } else {
+                    self.left.as_mut().unwrap().insert(value);
+                }
+            }
+        }
+
     }
 }
 
