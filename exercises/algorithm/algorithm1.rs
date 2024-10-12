@@ -9,40 +9,51 @@ use std::ptr::NonNull;
 use std::vec::*;
 
 #[derive(Debug)]
-struct Node<T> {
+struct Node<T>
+where
+    T: Display + PartialOrd + Clone,
+{
     val: T,
     next: Option<NonNull<Node<T>>>,
 }
 
-impl<T> Node<T> {
+impl<T> Node<T>
+where
+    T: Display + PartialOrd + Clone,
+{
     fn new(t: T) -> Node<T> {
         Node { val: t, next: None }
     }
 }
 #[derive(Debug)]
-struct LinkedList<T> {
+struct LinkedList<T>
+where
+    T: Display + PartialOrd + Clone,
+{
     length: u32,
     start: Option<NonNull<Node<T>>>,
     end: Option<NonNull<Node<T>>>,
 }
 
-impl<T> Default for LinkedList<T> {
+impl<T> Default for LinkedList<T>
+where
+    T: Display + PartialOrd + Clone,
+{
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<T> LinkedList<T> {
+impl<T> LinkedList<T>
+where
+    T: Display + PartialOrd + Clone,
+{
     pub fn new() -> Self {
         Self {
             length: 0,
             start: None,
             end: None,
         }
-    }
-
-    fn cmp(a: &T, b: &T) -> bool {
-        a < b
     }
 
     pub fn add(&mut self, obj: T) {
@@ -70,16 +81,45 @@ impl<T> LinkedList<T> {
             },
         }
     }
-    pub fn merge(list_a: LinkedList<T>, mut list_b: LinkedList<T>) -> Self {
+    pub fn merge(list_a: LinkedList<T>, list_b: LinkedList<T>) -> Self {
         //TODO
         let mut list_c = LinkedList::<T>::new();
+        let mut cur_a = list_a.start;
+        let mut cur_b = list_b.start;
+
+        while let (Some(ptr_a), Some(ptr_b)) = (cur_a, cur_b) {
+            unsafe {
+                if (*ptr_a.as_ptr()).val < (*ptr_b.as_ptr()).val {
+                    list_c.add((*ptr_a.as_ptr()).val.clone());
+                    cur_a = (*ptr_a.as_ptr()).next;
+                } else {
+                    list_c.add((*ptr_b.as_ptr()).val.clone());
+                    cur_b = (*ptr_b.as_ptr()).next;
+                }
+            }
+        }
+
+        while let Some(ptr_a) = cur_a {
+            unsafe {
+                list_c.add((*ptr_a.as_ptr()).val.clone());
+                cur_a = (*ptr_a.as_ptr()).next;
+            }
+        }
+
+        while let Some(ptr_b) = cur_b {
+            unsafe {
+                list_c.add((*ptr_b.as_ptr()).val.clone());
+                cur_b = (*ptr_b.as_ptr()).next;
+            }
+        }
+
         list_c
     }
 }
 
 impl<T> Display for LinkedList<T>
 where
-    T: Display,
+    T: Display + PartialOrd + Clone,
 {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         match self.start {
@@ -91,7 +131,7 @@ where
 
 impl<T> Display for Node<T>
 where
-    T: Display,
+    T: Display + PartialOrd + Clone,
 {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         match self.next {
