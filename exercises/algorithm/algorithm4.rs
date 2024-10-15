@@ -77,7 +77,6 @@ where
 
     // Search for a value in the BST
     fn search(&self, value: T) -> bool {
-        //TODO
         let mut lp = &self.root;
         while let Some(ref root) = lp {
             if root.value == value {
